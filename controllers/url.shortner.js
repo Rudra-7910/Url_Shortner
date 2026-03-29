@@ -13,7 +13,7 @@ export const createUrl=async(req,res)=>{
             redirectUrl:redirectUrl,
         })
         obj.save();
-        return res.status(500).json({
+        return res.status(201).json({
             success:true , 
             message:"short Url is ready ",
             data:obj,
@@ -28,7 +28,7 @@ export const createUrl=async(req,res)=>{
 export const getAllUrl=async(req,res)=>{
     try {
         const urls= await Url.find()
-        return res.status(500).json({
+        return res.status(200).json({
             success:true , 
             message:"All shorted URLs  ",
             data:urls,

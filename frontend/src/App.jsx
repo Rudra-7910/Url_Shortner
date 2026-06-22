@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import axios from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
 
-const API_BASE = 'http://localhost:3000/api/v1'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1'
 
 function App() {
-  const [url, setUrl] = useState('')
   const [shortened, setShortened] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [copied, setCopied] = useState(false)
   const queryClient = useQueryClient()
+  const { register, handleSubmit, reset, formState: { errors } } = useForm()
   const { data: links = [] } = useQuery({
     queryKey: ['links'],
     queryFn: async () => {
@@ -30,7 +31,7 @@ function App() {
     onSuccess: (data) => {
       if (data.success) {
         setShortened(data.data)
-        setUrl('')
+        reset()
         setErrorMsg('')
         queryClient.invalidateQueries({ queryKey: ['links'] })
       } else {
@@ -41,13 +42,11 @@ function App() {
       setErrorMsg('Failed to connect to server')
     }
   })
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!url) return
+  const onSubmit = (data) => {
     setCopied(false)
     setShortened(null)
     setErrorMsg('')
-    shortenMutation.mutate(url)
+    shortenMutation.mutate(data.url)
   }
   const handleCopy = () => {
     if (!shortened) return
@@ -71,32 +70,28 @@ function App() {
         <p className="text-slate-500 mt-2 text-base">
           Fast, simple and clean URL shortening.
         </p>
-
-        <form onSubmit={handleSubmit} className="mt-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
           <div className="flex justify-center gap-3">
             <input
               className="border border-slate-300 px-4 py-3 rounded-xl w-full max-w-xl outline-none focus:border-green-500 transition-colors"
               type="url"
               placeholder="Paste your long link here..."
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              required
+              {...register("url", { required: "URL is required" })}
             />
             <button
               type="submit"
-              disabled={loading || !url}
+              disabled={loading}
               className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-all disabled:opacity-50 font-medium"
             >
               {loading ? 'Shortening...' : 'Shorten'}
             </button>
           </div>
-          {errorMsg && (
+          {(errors.url || errorMsg) && (
             <p className="text-red-500 mt-3 text-sm font-medium">
-              {errorMsg}
+              {errors.url?.message || errorMsg}
             </p>
           )}
         </form>
-
         {shortened && (
           <div className="mt-8 border rounded-2xl p-6 max-w-xl mx-auto bg-slate-50 shadow-sm transition-all">
             <p className="text-green-600 font-medium mb-3">
@@ -106,7 +101,7 @@ function App() {
               href={`${API_BASE}/${shortened.shortId}`}
               className="text-blue-600 text-lg break-all hover:underline"
             >
-              localhost:3000/api/v1/{shortened.shortId}
+              {API_BASE.replace(/^https?:\/\//, '')}/{shortened.shortId}
             </a>
             <div className="mt-5">
               <button
@@ -119,7 +114,6 @@ function App() {
           </div>
         )}
       </main>
-
       {links.length > 0 && (
         <section className="max-w-3xl mx-auto mt-16 px-4">
           <div className="flex justify-between items-center mb-6">
@@ -130,7 +124,6 @@ function App() {
               {links.length} total
             </span>
           </div>
-
           <div className="space-y-4">
             {links.map((item) => (
               <div
@@ -150,7 +143,7 @@ function App() {
                     rel="noreferrer"
                     className="text-blue-600 text-sm hover:underline"
                   >
-                    localhost:3000/api/v1/{item.shortId}
+                    {API_BASE.replace(/^https?:\/\//, '')}/{item.shortId}
                   </a>
                 </div>
                 <div className="text-sm text-slate-500 whitespace-nowrap bg-slate-50 px-3 py-1.5 rounded-lg border font-medium">

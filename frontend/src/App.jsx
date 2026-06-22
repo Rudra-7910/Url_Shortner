@@ -7,9 +7,7 @@ function App() {
   const [error, setError] = useState('')
   const [links, setLinks] = useState([])
   const [copied, setCopied] = useState(false)
-
   const API_BASE = 'http://localhost:3000/api/v1'
-
   const fetchLinks = async () => {
     try {
       const res = await fetch(API_BASE)
@@ -21,7 +19,6 @@ function App() {
       console.error(err)
     }
   }
-
   useEffect(() => {
     fetchLinks()
   }, [])
@@ -42,7 +39,6 @@ function App() {
         body: JSON.stringify({ redirectUrl: url })
       })
       const data = await res.json()
-      
       if (data.success) {
         setShortened(data.data)
         setUrl('')
@@ -64,84 +60,103 @@ function App() {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
-
-  return (
-    <>
-      <header className="header">
-        <div className="logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-          </svg>
-          Trim<span>Link</span>
+return (
+<> <header className="bg-slate-100 py-4 shadow-sm"> <div className="text-4xl font-serif text-center">
+Trim <span className="text-red-500">Link</span> </div> </header>
+<main className="mt-16 text-center px-4">
+  <h1 className="text-3xl font-semibold">
+    Shorten your links
+  </h1>
+  <p className="text-slate-500 mt-2 text-base">
+    Fast, simple and clean URL shortening.
+  </p>
+  <form onSubmit={handleSubmit} className="mt-8">
+    <div className="flex justify-center gap-3">
+      <input
+        className="border border-slate-300 px-4 py-3 rounded-xl w-full max-w-xl outline-none focus:border-green-500"
+        type="url"
+        placeholder="Paste your long link here..."
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        required
+      />
+      <button
+        type="submit"
+        disabled={loading || !url}
+        className="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl transition disabled:opacity-50"
+      >
+        {loading ? "..." : "Shorten"}
+      </button>
+    </div>
+    {error && (
+      <p className="text-red-500 mt-3 text-sm">
+        {error}
+      </p>
+    )}
+  </form>
+  {shortened && (
+    <div className="mt-8 border rounded-2xl p-5 max-w-xl mx-auto bg-slate-50 shadow-sm">
+      <p className="text-green-600 font-medium mb-2">
+        Your shortened link is ready
+      </p>
+      <a
+        href={`${API_BASE}/${shortened.shortId}`}
+        target="_blank"
+        rel="noreferrer"
+        className="text-blue-600 break-all hover:underline"
+      >
+        localhost:3000/api/v1/{shortened.shortId}
+      </a>
+      <div>
+        <button
+          onClick={handleCopy}
+          className="mt-4 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700"
+        >
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+    </div>
+  )}
+</main>
+{links.length > 0 && (
+  <section className="max-w-3xl mx-auto mt-12 px-4 mb-10">
+    <div className="flex justify-between items-center mb-5">
+      <h3 className="text-2xl font-semibold">
+        Recent Links
+      </h3>
+      <span className="text-slate-500">
+        {links.length} total
+      </span>
+    </div>
+    <div className="space-y-3">
+      {links.map((item) => (
+        <div
+          key={item._id}
+          className="border rounded-xl p-4 text-left shadow-sm hover:shadow-md transition"
+        >
+          <p
+            className="truncate text-slate-700 mb-2"
+            title={item.redirectUrl}
+          >
+            {item.redirectUrl}
+          </p>
+          <a
+            href={`${API_BASE}/${item.shortId}`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-600 text-sm hover:underline"
+          >
+            localhost:3000/api/v1/{item.shortId}
+          </a>
+          <p className="text-sm text-slate-500 mt-2">
+            {item.visited} clicks
+          </p>
         </div>
-      </header>
-
-      <main className="hero-section">
-        <h1 className="hero-title">Shorten your links.</h1>
-        <p className="hero-subtitle">A minimalist, high-performance URL shortener built for modern teams.</p>
-        
-        <form className="shortener-form" onSubmit={handleSubmit}>
-          <div className="input-wrapper">
-            <input 
-              type="url" 
-              className="url-input" 
-              placeholder="Paste your long link here..." 
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              required
-            />
-            <button type="submit" className="btn-submit" disabled={loading || !url}>
-              {loading ? <div className="spinner" /> : 'Shorten'}
-            </button>
-          </div>
-          {error && <div style={{ color: '#ff4444', fontSize: '0.9rem', textAlign: 'left', marginTop: '4px', paddingLeft: '8px' }}>{error}</div>}
-        </form>
-
-        {shortened && (
-          <div className="result-card">
-            <div className="result-info">
-               <span className="result-label">Your shortened link is ready <br /></span>
-               <a href={`${API_BASE}/${shortened.shortId}`} target="_blank" rel="noreferrer" className="short-url">
-                 localhost:3000/api/v1/{shortened.shortId}
-               </a>
-            </div>
-            <button className="btn-copy" onClick={handleCopy}>
-              {copied ? 'Copied!' : 'Copy Info'}
-            </button>
-          </div>
-        )}
-      </main>
-
-      {links.length > 0 && (
-        <section className="links-section">
-          <div className="section-header">
-            <h3>Recent Links</h3>
-            <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: '400' }}>{links.length} total</span>
-          </div>
-          <div className="links-grid">
-            {links.map((item) => (
-              <div key={item._id} className="link-row">
-                <div className="row-original" title={item.redirectUrl}>
-                  {item.redirectUrl}
-                </div>
-                <a href={`${API_BASE}/${item.shortId}`} target="_blank" rel="noreferrer" className="row-short">
-                  localhost:3000/api/v1/{item.shortId}
-                </a>
-                <div className="row-stats">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                  {item.visited} clicks
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </>
+      ))}
+    </div>
+  </section>
+)}
+</>
   )
 }
-
 export default App

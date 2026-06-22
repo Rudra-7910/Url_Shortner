@@ -9,8 +9,8 @@ export const createUrl=async(req,res)=>{
         }
         let shortId= nanoid(5)
         const obj= new Url ({
-            shortId:shortId,
-            redirectUrl:redirectUrl,
+            shortId,
+            redirectUrl,
         })
         obj.save();
         return res.status(201).json({

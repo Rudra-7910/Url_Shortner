@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { connectDB } from "./db/index.js";
 const port = process.env.PORT || 3000;
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
+// dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const startServer= async()=>{
     try {
         await connectDB();

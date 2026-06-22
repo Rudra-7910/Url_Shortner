@@ -8,6 +8,7 @@ function App() {
   const [errorMsg, setErrorMsg] = useState('')
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState(false)
+  const[totalPages,setTotalPages]=useState(1);
   const queryClient = useQueryClient()
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
   const { data: links = [] } = useQuery({
@@ -15,10 +16,11 @@ function App() {
     queryFn: async () => {
       try {
         const res = await axios.get(`${API_BASE}?page=${page}&limit=5`)
-        return res.data.success ? res.data.data : []
+        setTotalPages(res.data.totalPages);
+        return res.data.success ? res.data : { data: [], totalItems: 0, totalPages: 1 }
       } catch (err) {
         console.error('Failed to fetch links:', err)
-        return []
+        return { data: [], totalItems: 0, totalPages: 1 }
       }
     }
   })
@@ -113,18 +115,18 @@ function App() {
           </div>
         )}
       </main>
-      {links.length > 0 && (
+      {links?.data?.length > 0 && (
         <section className="max-w-3xl mx-auto mt-16 px-4">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-2xl font-semibold text-slate-800">
               Recent Links
             </h3>
             <span className="text-slate-500 bg-slate-100 px-3 py-1 rounded-full text-sm font-medium">
-              {links.length} total
+              {links.totalItems} total
             </span>
           </div>
           <div className="space-y-4">
-            {links.map((item) => (
+            {links.data.map((item) => (
               <div
                 key={item._id}
                 className="border rounded-xl p-5 text-left shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white"
@@ -151,10 +153,10 @@ function App() {
               </div>
             ))}
           </div>
-          <div className='flex gap-3'>
-            <button disabled={page === 1} onClick={()=>setPage((page) => page - 1)} className='p-2 mt-5 disabled:opacity-50'> Prev </button>
-            <span className='font-bold mt-7'>{page}</span>
-            <button disabled={links.length < 5} onClick={()=>setPage((page) => page + 1)} className='p-2 mt-5 disabled:opacity-50'>Next</button>
+          <div className='flex justify-center items-center gap-4 mt-8'>
+            <button disabled={page === 1} onClick={()=>setPage((page) => page - 1)} className='p-2 mt-5 disabled:opacity-50 border rounded-xl  bg-gray-300'> Prev </button>
+            <span className='font-bold mt-7'>{page} of {totalPages}</span>
+            <button disabled={page === links.totalPages} onClick={()=>setPage((page) => page + 1)} className='p-2 mt-5 disabled:opacity-50 border rounded-xl  bg-gray-300'>Next</button>
           </div>
         </section>
       )}

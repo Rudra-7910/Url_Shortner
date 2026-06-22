@@ -30,10 +30,15 @@ export const getAllUrl = async (req, res) => {
         const limit= Number(req.query.limit)||5;
         const skip=(page-1)*limit;
         const urls = await Url.find().sort({createdAt:-1}).skip(skip).limit(limit);
+        const totalItems = await Url.countDocuments();
+        const totalPages = Math.ceil(totalItems / limit);
         return res.status(200).json({
             success: true,
             message: "All shorted URLs  ",
             data: urls,
+            currentPage: page,
+            totalPages: totalPages,
+            totalItems: totalItems
         })
     } catch (error) {
         return res.status(400).json({

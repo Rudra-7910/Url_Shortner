@@ -104,8 +104,6 @@ function App() {
             </p>
             <a
               href={`${API_BASE}/${shortened.shortId}`}
-              target="_blank"
-              rel="noreferrer"
               className="text-blue-600 text-lg break-all hover:underline"
             >
               localhost:3000/api/v1/{shortened.shortId}

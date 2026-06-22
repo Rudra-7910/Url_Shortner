@@ -6,15 +6,16 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api
 function App() {
   const [shortened, setShortened] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [page, setPage] = useState(1);
   const [copied, setCopied] = useState(false)
   const queryClient = useQueryClient()
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
   const { data: links = [] } = useQuery({
-    queryKey: ['links'],
+    queryKey: ['links', page],
     queryFn: async () => {
       try {
-        const res = await axios.get(API_BASE)
-        return res.data.success ? res.data.data.reverse() : []
+        const res = await axios.get(`${API_BASE}?page=${page}&limit=5`)
+        return res.data.success ? res.data.data : []
       } catch (err) {
         console.error('Failed to fetch links:', err)
         return []
@@ -149,6 +150,11 @@ function App() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className='flex gap-3'>
+            <button disabled={page === 1} onClick={()=>setPage((page) => page - 1)} className='p-2 mt-5 disabled:opacity-50'> Prev </button>
+            <span className='font-bold mt-7'>{page}</span>
+            <button disabled={links.length < 5} onClick={()=>setPage((page) => page + 1)} className='p-2 mt-5 disabled:opacity-50'>Next</button>
           </div>
         </section>
       )}

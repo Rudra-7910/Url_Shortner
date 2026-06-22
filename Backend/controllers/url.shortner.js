@@ -29,7 +29,7 @@ export const getAllUrl = async (req, res) => {
         const page= Number(req.query.page)||1;
         const limit= Number(req.query.limit)||5;
         const skip=(page-1)*limit;
-        const urls = (await Url.find()).toSorted({createdAt:-1}).skip(skip).limit(limit);
+        const urls = await Url.find().sort({createdAt:-1}).skip(skip).limit(limit);
         return res.status(200).json({
             success: true,
             message: "All shorted URLs  ",

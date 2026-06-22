@@ -2,9 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1'
-
 function App() {
   const [shortened, setShortened] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')

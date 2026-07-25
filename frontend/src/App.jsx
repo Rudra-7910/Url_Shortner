@@ -11,6 +11,8 @@ function App() {
   const[totalPages,setTotalPages]=useState(1);
   const queryClient = useQueryClient()
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
+
+
   const { data: links = [] } = useQuery({
     queryKey: ['links', page],
     queryFn: async () => {
@@ -24,6 +26,8 @@ function App() {
       }
     }
   })
+
+  
   const shortenMutation = useMutation({
     mutationFn: async (redirectUrl) => {
       const res = await axios.post(API_BASE, { redirectUrl })
@@ -57,6 +61,7 @@ function App() {
     setTimeout(() => setCopied(false), 2000)
   }
   const loading = shortenMutation.isPending
+  
   return (
     <div className="min-h-screen bg-white pb-10">
       <header className="bg-slate-100 py-4 shadow-sm">
@@ -154,9 +159,11 @@ function App() {
             ))}
           </div>
           <div className='flex justify-center items-center gap-4 mt-8'>
-            <button disabled={page === 1} onClick={()=>setPage((page) => page - 1)} className='p-2 mt-5 disabled:opacity-50 border rounded-xl  bg-gray-300'> Prev </button>
+            <button disabled={page === 1} onClick={()=>setPage((page) => page - 1)}
+             className='p-2 mt-5 disabled:opacity-50 border rounded-xl  bg-gray-300'> Prev </button>
             <span className='font-bold mt-7'>{page} of {totalPages}</span>
-            <button disabled={page === links.totalPages} onClick={()=>setPage((page) => page + 1)} className='p-2 mt-5 disabled:opacity-50 border rounded-xl  bg-gray-300'>Next</button>
+            <button disabled={page === links.totalPages} onClick={()=>setPage((page) => page + 1)} 
+            className='p-2 mt-5 disabled:opacity-50 border rounded-xl  bg-gray-300'>Next</button>
           </div>
         </section>
       )}

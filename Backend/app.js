@@ -6,8 +6,8 @@ import { urlRouter } from "./routes/url.shortner.route.js";
 const app = express();
 app.use(helmet());
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5174",
-    credentials: true,
+  origin: (process.env.FRONTEND_URL || "http://localhost:5174").replace(/\/+$/, ""),
+  credentials: true,
 };
 app.use(cors(corsOptions));
 const limiter = rateLimit({

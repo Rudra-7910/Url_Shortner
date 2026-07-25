@@ -27,7 +27,7 @@ function App() {
     }
   })
 
-  
+
   const shortenMutation = useMutation({
     mutationFn: async (redirectUrl) => {
       const res = await axios.post(API_BASE, { redirectUrl })
@@ -47,12 +47,16 @@ function App() {
       setErrorMsg('Failed to connect to server')
     }
   })
+
+
   const onSubmit = (data) => {
     setCopied(false)
     setShortened(null)
     setErrorMsg('')
     shortenMutation.mutate(data.url)
   }
+
+  
   const handleCopy = () => {
     if (!shortened) return
     const shortUrl = `${API_BASE}/${shortened.shortId}`

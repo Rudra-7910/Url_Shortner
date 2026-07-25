@@ -17,7 +17,7 @@ function App() {
     queryKey: ['links', page],
     queryFn: async () => {
       try {
-        const res = await axios.get(`${API_BASE}?page=${page}&limit=5`)
+        const res = await  axios.get(`${API_BASE}?page=${page}&limit=5`)
         setTotalPages(res.data.totalPages);
         return res.data.success ? res.data : { data: [], totalItems: 0, totalPages: 1 }
       } catch (err) {
